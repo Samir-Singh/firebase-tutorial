@@ -9,6 +9,7 @@ export default function Home() {
 
   const pushUser = () => {
     putData(`users/${name}`, { id: Date.now(), name });
+    setName("");
   };
 
   return (
@@ -23,7 +24,7 @@ export default function Home() {
         className="border mr-2 p-2"
       />
 
-      <button className="border py-1 px-2" onClick={pushUser}>
+      <button disabled={!name} className="border py-1 px-2" onClick={pushUser}>
         Push Data
       </button>
     </div>

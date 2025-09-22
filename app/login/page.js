@@ -9,6 +9,7 @@ const Signup = () => {
   const {
     signInUserWithEmailAndPassword,
     signupUserWithEmailAndPassword,
+    signInUserWithProvider,
     putAuth,
   } = useGlobalContext();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
@@ -26,6 +27,28 @@ const Signup = () => {
 
   const loginUser = () => {
     signInUserWithEmailAndPassword(loginForm.email, loginForm.password)
+      .then((res) => {
+        putAuth(res.user.accessToken);
+        router.push("/about-us");
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  };
+
+  const handleGoogleSignIn = async () => {
+    signInUserWithProvider("Google")
+      .then((res) => {
+        putAuth(res.user.accessToken);
+        router.push("/about-us");
+      })
+      .catch((err) => {
+        alert(err);
+      });
+  };
+
+  const handleGithubSignIn = async () => {
+    signInUserWithProvider("Github")
       .then((res) => {
         putAuth(res.user.accessToken);
         router.push("/about-us");
@@ -75,6 +98,20 @@ const Signup = () => {
           className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
         >
           Login
+        </button>{" "}
+        /{" "}
+        <button
+          onClick={handleGoogleSignIn}
+          className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
+        >
+          Google Sign In
+        </button>{" "}
+        /{" "}
+        <button
+          onClick={handleGithubSignIn}
+          className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
+        >
+          Github Sign In
         </button>
       </div>
 

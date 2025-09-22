@@ -6,6 +6,9 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
 import { useRouter } from "next/navigation";
@@ -26,6 +29,8 @@ const firebaseDataBase = getDatabase(firebaseApp);
 
 const GlobalContext = createContext(null);
 export const useGlobalContext = () => useContext(GlobalContext);
+const GoogleProvider = new GoogleAuthProvider();
+const GithubProvider = new GithubAuthProvider();
 
 const GlobalProvider = ({ children }) => {
   const router = useRouter();
@@ -35,6 +40,21 @@ const GlobalProvider = ({ children }) => {
 
   const signInUserWithEmailAndPassword = (email, password) =>
     signInWithEmailAndPassword(firebaseAuth, email, password);
+
+  const signInUserWithProvider = (providerName) => {
+    if (!providerName) {
+      alert("Please provide a provider name");
+      return;
+    }
+    return signInWithPopup(
+      firebaseAuth,
+      providerName === "Google"
+        ? GoogleProvider
+        : providerName === "Github"
+        ? GithubProvider
+        : null
+    );
+  };
 
   const putData = (key, data) => set(ref(firebaseDataBase, key), data);
 
@@ -53,7 +73,7 @@ const GlobalProvider = ({ children }) => {
     if (localStorage.getItem("token")) {
       setAuth(localStorage.getItem("token"));
     }
-  }, [localStorage]);
+  }, []);
 
   return (
     <GlobalContext.Provider
@@ -64,6 +84,7 @@ const GlobalProvider = ({ children }) => {
         auth,
         putAuth,
         clearAuth,
+        signInUserWithProvider,
       }}
     >
       {children}
