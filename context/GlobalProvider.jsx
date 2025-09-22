@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -11,7 +11,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
-import { useRouter } from "next/navigation";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBTcBuhO70j0YOLGvPvFkVf4w_ke50DW44",
