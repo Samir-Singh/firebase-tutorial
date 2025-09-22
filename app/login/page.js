@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useFirebase } from "@/context/FirebaseProvider";
+import { useRouter } from "next/navigation";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const Signup = () => {
-  const { signInUserWithEmailAndPassword, signupUserWithEmailAndPassword } =
-    useFirebase();
+  const router = useRouter();
+  const {
+    signInUserWithEmailAndPassword,
+    signupUserWithEmailAndPassword,
+    putAuth,
+  } = useGlobalContext();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [formData, setFormData] = useState({ email: "", password: "" });
 
@@ -21,8 +26,9 @@ const Signup = () => {
 
   const loginUser = () => {
     signInUserWithEmailAndPassword(loginForm.email, loginForm.password)
-      .then(() => {
-        alert("Success");
+      .then((res) => {
+        putAuth(res.user.accessToken);
+        router.push("/about-us");
       })
       .catch((err) => {
         alert(err);

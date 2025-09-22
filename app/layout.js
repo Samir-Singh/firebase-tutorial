@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
-import { FirebaseProvider } from "@/context/FirebaseProvider";
+import GlobalProvider from "@/context/GlobalProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,10 +25,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <FirebaseProvider>
+        <GlobalProvider>
           <Header />
           {children}
-        </FirebaseProvider>
+        </GlobalProvider>
       </body>
     </html>
   );

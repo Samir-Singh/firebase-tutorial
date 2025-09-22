@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
+import { useRouter } from "next/navigation";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBTcBuhO70j0YOLGvPvFkVf4w_ke50DW44",
@@ -23,29 +24,51 @@ const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
 const firebaseDataBase = getDatabase(firebaseApp);
 
-const FirebaseContext = createContext(null);
-export const useFirebase = () => useContext(FirebaseContext);
+const GlobalContext = createContext(null);
+export const useGlobalContext = () => useContext(GlobalContext);
 
-export const FirebaseProvider = ({ children }) => {
+const GlobalProvider = ({ children }) => {
+  const router = useRouter();
+  const [auth, setAuth] = useState(null);
   const signupUserWithEmailAndPassword = (email, password) =>
     createUserWithEmailAndPassword(firebaseAuth, email, password);
 
   const signInUserWithEmailAndPassword = (email, password) =>
     signInWithEmailAndPassword(firebaseAuth, email, password);
 
-  const putData = (key, data) => {
-    set(ref(firebaseDataBase, key), data);
+  const putData = (key, data) => set(ref(firebaseDataBase, key), data);
+
+  const clearAuth = () => {
+    setAuth(null);
+    localStorage.removeItem("token");
+    router.push("/login");
   };
 
+  const putAuth = (data) => {
+    localStorage.setItem("token", data);
+    setAuth(data);
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      setAuth(localStorage.getItem("token"));
+    }
+  }, [localStorage]);
+
   return (
-    <FirebaseContext.Provider
+    <GlobalContext.Provider
       value={{
         signupUserWithEmailAndPassword,
         signInUserWithEmailAndPassword,
         putData,
+        auth,
+        putAuth,
+        clearAuth,
       }}
     >
       {children}
-    </FirebaseContext.Provider>
+    </GlobalContext.Provider>
   );
 };
+
+export default GlobalProvider;

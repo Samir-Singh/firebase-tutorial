@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useFirebase } from "@/context/FirebaseProvider";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 export default function Home() {
-  const { putData } = useFirebase();
   const [name, setName] = useState("");
+  const { putData } = useGlobalContext();
 
   const pushUser = () => {
     putData(`users/${name}`, { id: Date.now(), name });
