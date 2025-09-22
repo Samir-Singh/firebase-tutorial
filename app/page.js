@@ -1,23 +1,27 @@
 "use client";
 
-import { app } from "./firebase";
-import { getDatabase, ref, set } from "firebase/database";
+import { useState } from "react";
+import { useFirebase } from "@/context/FirebaseProvider";
 
 export default function Home() {
-  const db = getDatabase(app);
+  const { putData } = useFirebase();
+  const [name, setName] = useState("");
 
   const pushUser = () => {
-    console.log("data pushed");
-    set(ref(db, "users/john"), {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-    });
+    putData(`users/${name}`, { id: Date.now(), name });
   };
 
   return (
     <div>
       <h1>Firebase Tutorial</h1>
+
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e?.target?.value)}
+        placeholder="Enter Name"
+        className="border mr-2 p-2"
+      />
 
       <button className="border py-1 px-2" onClick={pushUser}>
         Push Data

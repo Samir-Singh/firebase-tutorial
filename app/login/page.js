@@ -1,38 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { app } from "../firebase";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { useFirebase } from "@/context/FirebaseProvider";
 
 const Signup = () => {
-  const auth = getAuth(app);
+  const { signInUserWithEmailAndPassword, signupUserWithEmailAndPassword } =
+    useFirebase();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const signUpUser = () => {
-    createUserWithEmailAndPassword(auth, formData.email, formData.password)
-      .then((res) => {
-        console.log(res);
+    signupUserWithEmailAndPassword(formData.email, formData.password)
+      .then(() => {
         alert("Success");
       })
       .catch((err) => {
-        console.log(err);
         alert(err);
       });
   };
 
   const loginUser = () => {
-    signInWithEmailAndPassword(auth, loginForm.email, loginForm.password)
-      .then((res) => {
-        console.log(res);
+    signInUserWithEmailAndPassword(loginForm.email, loginForm.password)
+      .then(() => {
         alert("Success");
       })
       .catch((err) => {
-        console.log(err);
         alert(err);
       });
   };
