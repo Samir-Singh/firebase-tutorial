@@ -1,18 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import Link from "next/link";
 
 const Header = () => {
-  const { auth, clearAuth } = useGlobalContext();
+  const { isLoggedIn, LogoutUser } = useGlobalContext();
 
   return (
     <div className="flex items-center gap-5 bg-gray-400 p-2 px-4 mb-2 text-white">
-      {auth ? (
+      {isLoggedIn ? (
         <>
           <Link href="/about-us">About</Link>
           <Link href="/contact-us">Contact Us</Link>
-          <span onClick={() => clearAuth()} className="cursor-pointer">
+          <span onClick={() => LogoutUser()} className="cursor-pointer">
             Log Out
           </span>
         </>

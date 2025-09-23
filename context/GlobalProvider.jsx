@@ -1,16 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { initializeApp } from "firebase/app";
 import {
-  getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
+  getAuth,
   GithubAuthProvider,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const firebaseConfig = {
@@ -34,7 +36,7 @@ const GithubProvider = new GithubAuthProvider();
 
 const GlobalProvider = ({ children }) => {
   const router = useRouter();
-  const [auth, setAuth] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const signupUserWithEmailAndPassword = (email, password) =>
     createUserWithEmailAndPassword(firebaseAuth, email, password);
 
@@ -58,22 +60,23 @@ const GlobalProvider = ({ children }) => {
 
   const putData = (key, data) => set(ref(firebaseDataBase, key), data);
 
-  const clearAuth = () => {
-    setAuth(null);
-    localStorage.removeItem("token");
-    router.push("/login");
-  };
-
-  const putAuth = (data) => {
-    localStorage.setItem("token", data);
-    setAuth(data);
-  };
-
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      setAuth(localStorage.getItem("token"));
-    }
+    onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        console.log("User Logged In");
+        setIsLoggedIn(true);
+        router.push("/about-us");
+      } else {
+        console.log("User Logged Out");
+        setIsLoggedIn(false);
+        router.push("/login");
+      }
+    });
   }, []);
+
+  const LogoutUser = () => {
+    signOut(firebaseAuth);
+  };
 
   return (
     <GlobalContext.Provider
@@ -81,10 +84,9 @@ const GlobalProvider = ({ children }) => {
         signupUserWithEmailAndPassword,
         signInUserWithEmailAndPassword,
         putData,
-        auth,
-        putAuth,
-        clearAuth,
         signInUserWithProvider,
+        isLoggedIn,
+        LogoutUser,
       }}
     >
       {children}

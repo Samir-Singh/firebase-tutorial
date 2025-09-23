@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const Signup = () => {
   const router = useRouter();
@@ -10,7 +10,6 @@ const Signup = () => {
     signInUserWithEmailAndPassword,
     signupUserWithEmailAndPassword,
     signInUserWithProvider,
-    putAuth,
   } = useGlobalContext();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -27,8 +26,7 @@ const Signup = () => {
 
   const loginUser = () => {
     signInUserWithEmailAndPassword(loginForm.email, loginForm.password)
-      .then((res) => {
-        putAuth(res.user.accessToken);
+      .then((_) => {
         router.push("/about-us");
       })
       .catch((err) => {
@@ -38,8 +36,7 @@ const Signup = () => {
 
   const handleGoogleSignIn = async () => {
     signInUserWithProvider("Google")
-      .then((res) => {
-        putAuth(res.user.accessToken);
+      .then((_) => {
         router.push("/about-us");
       })
       .catch((err) => {
@@ -49,8 +46,7 @@ const Signup = () => {
 
   const handleGithubSignIn = async () => {
     signInUserWithProvider("Github")
-      .then((res) => {
-        putAuth(res.user.accessToken);
+      .then((_) => {
         router.push("/about-us");
       })
       .catch((err) => {
