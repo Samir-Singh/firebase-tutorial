@@ -6,16 +6,13 @@ import { useState } from "react";
 
 const Signup = () => {
   const router = useRouter();
-  const {
-    signInUserWithEmailAndPassword,
-    signupUserWithEmailAndPassword,
-    signInUserWithProvider,
-  } = useGlobalContext();
+  const { authentication } = useGlobalContext();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const signUpUser = () => {
-    signupUserWithEmailAndPassword(formData.email, formData.password)
+    authentication
+      .signupUserWithEmailAndPassword(formData.email, formData.password)
       .then(() => {
         alert("Success");
       })
@@ -25,7 +22,8 @@ const Signup = () => {
   };
 
   const loginUser = () => {
-    signInUserWithEmailAndPassword(loginForm.email, loginForm.password)
+    authentication
+      .signInUserWithEmailAndPassword(loginForm.email, loginForm.password)
       .then((_) => {
         router.push("/about-us");
       })
@@ -35,7 +33,8 @@ const Signup = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    signInUserWithProvider("Google")
+    authentication
+      .signInUserWithProvider("Google")
       .then((_) => {
         router.push("/about-us");
       })
@@ -45,7 +44,8 @@ const Signup = () => {
   };
 
   const handleGithubSignIn = async () => {
-    signInUserWithProvider("Github")
+    authentication
+      .signInUserWithProvider("Github")
       .then((_) => {
         router.push("/about-us");
       })

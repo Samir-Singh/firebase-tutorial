@@ -1,6 +1,7 @@
 "use client";
 
 import { initializeApp } from "firebase/app";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -33,6 +34,7 @@ const GlobalContext = createContext(null);
 export const useGlobalContext = () => useContext(GlobalContext);
 const GoogleProvider = new GoogleAuthProvider();
 const GithubProvider = new GithubAuthProvider();
+const fireStoreDb = getFirestore(firebaseApp);
 
 const GlobalProvider = ({ children }) => {
   const router = useRouter();
@@ -78,15 +80,32 @@ const GlobalProvider = ({ children }) => {
     signOut(firebaseAuth);
   };
 
+  const handleAddData = async (collectionName, payload) => {
+    try {
+      const docRef = await addDoc(
+        collection(fireStoreDb, collectionName),
+        payload
+      );
+      return docRef;
+    } catch (e) {
+      throw e;
+    }
+  };
+
   return (
     <GlobalContext.Provider
       value={{
-        signupUserWithEmailAndPassword,
-        signInUserWithEmailAndPassword,
         putData,
-        signInUserWithProvider,
-        isLoggedIn,
-        LogoutUser,
+        authentication: {
+          signupUserWithEmailAndPassword,
+          signInUserWithEmailAndPassword,
+          signInUserWithProvider,
+          isLoggedIn,
+          LogoutUser,
+        },
+        firestore: {
+          handleAddData,
+        },
       }}
     >
       {children}
