@@ -1,7 +1,6 @@
 "use client";
 
 import { initializeApp } from "firebase/app";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -13,6 +12,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
+import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -86,9 +86,32 @@ const GlobalProvider = ({ children }) => {
         collection(fireStoreDb, collectionName),
         payload
       );
-      return docRef;
-    } catch (e) {
-      throw e;
+      return { success: true, data: docRef, error: null };
+    } catch (error) {
+      return { success: false, data: null, error: error };
+    }
+  };
+
+  const handleReadData = async (collectionName) => {
+    try {
+      const querySnapShot = await getDocs(
+        collection(fireStoreDb, collectionName)
+      );
+      querySnapShot.forEach((doc) => {
+        console.log(`${doc.id} => ${doc.data()}`);
+      });
+
+      return {
+        success: true,
+        data: querySnapShot,
+        error: null,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null,
+        error: error,
+      };
     }
   };
 
@@ -105,6 +128,7 @@ const GlobalProvider = ({ children }) => {
         },
         firestore: {
           handleAddData,
+          handleReadData,
         },
       }}
     >

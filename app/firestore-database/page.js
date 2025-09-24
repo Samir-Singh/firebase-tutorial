@@ -4,6 +4,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import { useState } from "react";
 
 const FireStoreDatabase = () => {
+  const [collectionName, setCollectionName] = useState("");
   const [formData, setFormData] = useState({
     collection: "",
     name: "",
@@ -12,25 +13,31 @@ const FireStoreDatabase = () => {
   });
   const { firestore } = useGlobalContext();
 
-  const handleAddData = () => {
-    firestore
-      .handleAddData(formData.collection, {
-        name: formData.name,
-        age: Number(formData.age),
-        isAdmin: formData.isAdmin,
-      })
-      .then((res) => {
-        setFormData({ collection: "", name: "", age: "", isAdmin: false });
-        alert("Document added with ID: " + res.id);
-      })
-      .catch((err) => {
-        alert("Error adding document: " + err.message);
-      });
+  const handleAddData = async () => {
+    const result = await firestore.handleAddData(formData.collection, {
+      name: formData.name,
+      age: Number(formData.age),
+      isAdmin: formData.isAdmin,
+    });
+
+    if (result.success) {
+      setFormData({ collection: "", name: "", age: "", isAdmin: false });
+      alert("Document added with ID: " + result.data.id);
+    } else {
+      alert("Error adding document: " + result.error.message);
+    }
+  };
+
+  const handleReadData = async () => {
+    const result = await firestore.handleReadData(collectionName);
+    if (result.success) {
+      console.log("Documents in collection:", collectionName);
+    }
   };
 
   return (
     <div>
-      <h1 className="text-xl font-medium">FireStore Database</h1>
+      <h1 className="text-xl font-medium my-3">Adding Data into FireStore</h1>
       <p>
         Add Document in{" "}
         <input
@@ -88,6 +95,21 @@ const FireStoreDatabase = () => {
         className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
       >
         Add Collection
+      </button>
+
+      <hr className="my-5" />
+      <h1 className="text-xl font-medium">Read Data from FireStore</h1>
+      <input
+        value={collectionName}
+        onChange={(e) => setCollectionName(e.target.value)}
+        className="border px-2 rounded-sm mt-3"
+        placeholder="Enter collection name"
+      />
+      <button
+        onClick={handleReadData}
+        className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
+      >
+        Read Data
       </button>
     </div>
   );
