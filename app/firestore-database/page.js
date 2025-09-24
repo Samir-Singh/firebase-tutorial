@@ -19,7 +19,7 @@ const FireStoreDatabase = () => {
     const result = await firestore.handleAddData(formData.collection, {
       name: formData.name,
       age: Number(formData.age),
-      isAdmin: formData.isAdmin,
+      admin: formData.isAdmin,
     });
 
     if (result.success) {
@@ -40,6 +40,16 @@ const FireStoreDatabase = () => {
       setFireStoreData([]);
     }
     setLoading(false);
+  };
+
+  const handleDeleteData = async (name, id) => {
+    const result = await firestore.handleDeleteData(name, id);
+    if (result.success) {
+      alert("Data deleted successfully");
+      handleReadData();
+    } else {
+      alert("Error while deleting the data " + result.error.message);
+    }
   };
 
   return (
@@ -151,7 +161,10 @@ const FireStoreDatabase = () => {
                 <td className="px-5">{user.age}</td>
                 <td className="px-5">{user.isAdmin ? "Yes" : "No"}</td>
                 <td className="px-5">
-                  <button className="border bg-gray-300 px-2 rounded-sm cursor-pointer">
+                  <button
+                    onClick={() => handleDeleteData(collectionName, user.id)}
+                    className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
+                  >
                     Delete
                   </button>
                 </td>

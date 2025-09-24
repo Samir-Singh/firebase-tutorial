@@ -12,7 +12,14 @@ import {
   signOut,
 } from "firebase/auth";
 import { getDatabase, ref, set } from "firebase/database";
-import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  getFirestore,
+} from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -102,7 +109,6 @@ const GlobalProvider = ({ children }) => {
       querySnapShot.forEach((doc) => {
         documents.push({ id: doc.id, ...doc.data() });
       });
-
       return {
         success: true,
         data: documents,
@@ -114,6 +120,15 @@ const GlobalProvider = ({ children }) => {
         data: null,
         error: error,
       };
+    }
+  };
+
+  const handleDeleteData = async (collectionName, id) => {
+    try {
+      await deleteDoc(doc(fireStoreDb, collectionName, id));
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error };
     }
   };
 
@@ -131,6 +146,7 @@ const GlobalProvider = ({ children }) => {
         firestore: {
           handleAddData,
           handleReadData,
+          handleDeleteData,
         },
       }}
     >
