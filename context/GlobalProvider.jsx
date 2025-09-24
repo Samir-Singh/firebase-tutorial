@@ -97,13 +97,15 @@ const GlobalProvider = ({ children }) => {
       const querySnapShot = await getDocs(
         collection(fireStoreDb, collectionName)
       );
+
+      const documents = [];
       querySnapShot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`);
+        documents.push({ id: doc.id, ...doc.data() });
       });
 
       return {
         success: true,
-        data: querySnapShot,
+        data: documents,
         error: null,
       };
     } catch (error) {
