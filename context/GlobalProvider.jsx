@@ -19,6 +19,7 @@ import {
   doc,
   getDocs,
   getFirestore,
+  updateDoc,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -132,6 +133,16 @@ const GlobalProvider = ({ children }) => {
     }
   };
 
+  const handleUpdateData = async (collectionName, id, payload) => {
+    try {
+      const docRef = doc(fireStoreDb, collectionName, id);
+      await updateDoc(docRef, payload);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error };
+    }
+  };
+
   return (
     <GlobalContext.Provider
       value={{
@@ -147,6 +158,7 @@ const GlobalProvider = ({ children }) => {
           handleAddData,
           handleReadData,
           handleDeleteData,
+          handleUpdateData,
         },
       }}
     >

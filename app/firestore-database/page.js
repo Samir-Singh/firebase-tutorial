@@ -7,11 +7,17 @@ const FireStoreDatabase = () => {
   const [loading, setLoading] = useState(false);
   const [collectionName, setCollectionName] = useState("");
   const [fireStoreData, setFireStoreData] = useState([]);
+  const [updatingRow, setUpdatingRow] = useState({
+    id: "",
+    name: "",
+    age: "",
+    admin: "",
+  });
   const [formData, setFormData] = useState({
     collection: "",
     name: "",
     age: "",
-    isAdmin: false,
+    admin: "",
   });
   const { firestore } = useGlobalContext();
 
@@ -19,11 +25,11 @@ const FireStoreDatabase = () => {
     const result = await firestore.handleAddData(formData.collection, {
       name: formData.name,
       age: Number(formData.age),
-      admin: formData.isAdmin,
+      admin: formData.admin,
     });
 
     if (result.success) {
-      setFormData({ collection: "", name: "", age: "", isAdmin: false });
+      setFormData({ collection: "", name: "", age: "", admin: false });
       alert("Document added with ID: " + result.data.id);
     } else {
       alert("Error adding document: " + result.error.message);
@@ -49,6 +55,26 @@ const FireStoreDatabase = () => {
       handleReadData();
     } else {
       alert("Error while deleting the data " + result.error.message);
+    }
+  };
+
+  const handleUpdateData = async () => {
+    const result = await firestore.handleUpdateData(
+      collectionName,
+      updatingRow?.id,
+      {
+        name: updatingRow?.name,
+        age: updatingRow?.age,
+        admin: updatingRow?.admin,
+      }
+    );
+
+    if (result.success) {
+      alert("Data updated successfully");
+      setUpdatingRow({ id: "", name: "", age: "", admin: "" });
+      handleReadData();
+    } else {
+      alert("Error while updating the data " + result.error.message);
     }
   };
 
@@ -88,21 +114,21 @@ const FireStoreDatabase = () => {
       />
       <span>
         Is Admin ?{" "}
-        <label onClick={() => setFormData({ ...formData, isAdmin: true })}>
+        <label onClick={() => setFormData({ ...formData, admin: true })}>
           <input
-            onChange={() => setFormData({ ...formData, isAdmin: true })}
+            onChange={() => setFormData({ ...formData, admin: true })}
             type="radio"
             value="Yes"
-            checked={formData?.isAdmin === true}
+            checked={formData?.admin === true}
           />
           Yes
         </label>
-        <label onClick={() => setFormData({ ...formData, isAdmin: false })}>
+        <label onClick={() => setFormData({ ...formData, admin: false })}>
           <input
-            onChange={() => setFormData({ ...formData, isAdmin: false })}
+            onChange={() => setFormData({ ...formData, admin: false })}
             type="radio"
             value="No"
-            checked={formData?.isAdmin === false}
+            checked={formData?.admin === false}
           />
           No
         </label>
@@ -157,16 +183,114 @@ const FireStoreDatabase = () => {
             fireStoreData?.map((user) => (
               <tr key={user.id}>
                 <td className="px-5 py-5">{user.id}</td>
-                <td className="px-5">{user.name}</td>
-                <td className="px-5">{user.age}</td>
-                <td className="px-5">{user.isAdmin ? "Yes" : "No"}</td>
                 <td className="px-5">
-                  <button
-                    onClick={() => handleDeleteData(collectionName, user.id)}
-                    className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
-                  >
-                    Delete
-                  </button>
+                  {user?.id === updatingRow?.id ? (
+                    <input
+                      value={updatingRow.name}
+                      onChange={(e) =>
+                        setUpdatingRow((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
+                      className="border px-2 rounded-sm"
+                    />
+                  ) : (
+                    user.name
+                  )}
+                </td>
+                <td className="px-5">
+                  {user?.id === updatingRow?.id ? (
+                    <input
+                      value={updatingRow.age}
+                      onChange={(e) =>
+                        setUpdatingRow((prev) => ({
+                          ...prev,
+                          age: e.target.value,
+                        }))
+                      }
+                      className="border px-2 rounded-sm"
+                    />
+                  ) : (
+                    user.age
+                  )}
+                </td>
+                <td className="px-5">
+                  {user?.id === updatingRow?.id ? (
+                    <>
+                      <label
+                        onClick={() =>
+                          setUpdatingRow((prev) => ({ ...prev, admin: true }))
+                        }
+                      >
+                        <input
+                          onChange={() =>
+                            setUpdatingRow((prev) => ({
+                              ...prev,
+                              admin: true,
+                            }))
+                          }
+                          type="radio"
+                          value="Yes"
+                          checked={updatingRow?.admin === true}
+                        />
+                        Yes
+                      </label>
+                      <label
+                        onClick={() =>
+                          setUpdatingRow((prev) => ({
+                            ...prev,
+                            admin: false,
+                          }))
+                        }
+                      >
+                        <input
+                          onChange={() =>
+                            setUpdatingRow((prev) => ({
+                              ...prev,
+                              admin: false,
+                            }))
+                          }
+                          type="radio"
+                          value="No"
+                          checked={updatingRow?.admin === false}
+                        />
+                        No
+                      </label>
+                    </>
+                  ) : user.admin ? (
+                    "Yes"
+                  ) : (
+                    "No"
+                  )}
+                </td>
+                <td className="px-5">
+                  <div className="flex justify-center items-center gap-3">
+                    <button
+                      onClick={() => handleDeleteData(collectionName, user.id)}
+                      className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
+                    >
+                      Delete
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (updatingRow?.id) {
+                          handleUpdateData();
+                        } else {
+                          setUpdatingRow({
+                            id: user.id,
+                            name: user.name,
+                            age: user.age,
+                            admin: user.admin,
+                          });
+                        }
+                      }}
+                      className="border bg-gray-300 px-2 rounded-sm cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
