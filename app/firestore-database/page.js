@@ -17,7 +17,7 @@ const FireStoreDatabase = () => {
     collection: "",
     name: "",
     age: "",
-    admin: "",
+    admin: false,
   });
   const { firestore } = useGlobalContext();
 

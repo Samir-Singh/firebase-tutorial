@@ -24,6 +24,7 @@ const Header = () => {
           <Link href="/">Home</Link>
           <Link href="/login">Login</Link>
           <Link href="/firestore-database">FireStore</Link>
+          <Link href="/realtime-database">RealTime Database</Link>
         </>
       )}
     </div>
