@@ -11,7 +11,7 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { getDatabase, ref, set } from "firebase/database";
+import { child, get, getDatabase, onValue, ref, set } from "firebase/database";
 import {
   addDoc,
   collection,
@@ -69,6 +69,20 @@ const GlobalProvider = ({ children }) => {
   };
 
   const putData = (key, data) => set(ref(firebaseDataBase, key), data);
+  const getData = () => {
+    const dbRef = ref(firebaseDataBase);
+    get(child(dbRef, `users`))
+      .then((res) => {
+        if (res.exists()) {
+          console.log(res.val(), typeof res.val());
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
@@ -79,7 +93,6 @@ const GlobalProvider = ({ children }) => {
       } else {
         console.log("User Logged Out");
         setIsLoggedIn(false);
-        router.push("/login");
       }
     });
   }, []);
@@ -143,10 +156,26 @@ const GlobalProvider = ({ children }) => {
     }
   };
 
+  const handleAddRealTimeData = async (key, data) => {
+    try {
+      await set(ref(firebaseDataBase, key), data);
+      return { success: true, data: null, error: null };
+    } catch (error) {
+      return { success: false, data: null, error: error };
+    }
+  };
+
+  const handleReadRealTimeData = (key, setData) => {
+    onValue(ref(firebaseDataBase, key), (snapshot) => {
+      setData(Object.values(snapshot.val()));
+    });
+  };
+
   return (
     <GlobalContext.Provider
       value={{
         putData,
+        getData,
         authentication: {
           signupUserWithEmailAndPassword,
           signInUserWithEmailAndPassword,
@@ -159,6 +188,10 @@ const GlobalProvider = ({ children }) => {
           handleReadData,
           handleDeleteData,
           handleUpdateData,
+        },
+        realTimeDatabase: {
+          handleAddRealTimeData,
+          handleReadRealTimeData,
         },
       }}
     >

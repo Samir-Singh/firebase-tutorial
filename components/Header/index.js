@@ -2,8 +2,10 @@
 
 import { useGlobalContext } from "@/context/GlobalProvider";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
+  const router = useRouter();
   const { authentication } = useGlobalContext();
 
   return (
@@ -13,7 +15,10 @@ const Header = () => {
           <Link href="/about-us">About</Link>
           <Link href="/contact-us">Contact Us</Link>
           <span
-            onClick={() => authentication.LogoutUser()}
+            onClick={() => {
+              authentication.LogoutUser();
+              router.push("/login");
+            }}
             className="cursor-pointer"
           >
             Log Out

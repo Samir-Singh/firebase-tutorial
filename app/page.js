@@ -1,16 +1,24 @@
 "use client";
 
-import { useState } from "react";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [name, setName] = useState("");
-  const { putData } = useGlobalContext();
+  const { putData, getData } = useGlobalContext();
 
   const pushUser = () => {
     putData(`users/${name}`, { id: Date.now(), name });
     setName("");
   };
+
+  const getUser = () => {
+    getData();
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   return (
     <div>
