@@ -29,62 +29,55 @@ const FireStoreDatabase = () => {
         admin: formData.admin,
       })
       .then((result) => {
-        console.log("iuytfghjk", result);
         setFormData({ collection: "", name: "", age: "", admin: false });
-        alert("Document added with ID: " + result.data.id);
+        alert("Document added with ID: " + result.id);
       })
       .catch((error) => {
         alert("Error adding document: " + error.message);
       });
-
-    // if (result.success) {
-    //   setFormData({ collection: "", name: "", age: "", admin: false });
-    //   alert("Document added with ID: " + result.data.id);
-    // } else {
-    //   alert("Error adding document: " + result.error.message);
-    // }
   };
 
-  const handleReadData = async () => {
+  const handleReadData = () => {
     setLoading(true);
-    const result = await firestore.handleReadData(collectionName);
-    if (result.success) {
-      setFireStoreData(result.data);
-    } else {
-      alert("Error reading document: " + result.error.message);
-      setFireStoreData([]);
-    }
-    setLoading(false);
+    firestore
+      .handleReadData(collectionName)
+      .then((res) => setFireStoreData(res))
+      .catch((error) => {
+        alert("Error reading document: " + error.message);
+        setFireStoreData([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
-  const handleDeleteData = async (name, id) => {
-    const result = await firestore.handleDeleteData(name, id);
-    if (result.success) {
-      alert("Data deleted successfully");
-      handleReadData();
-    } else {
-      alert("Error while deleting the data " + result.error.message);
-    }
+  const handleDeleteData = (name, id) => {
+    firestore
+      .handleDeleteData(name, id)
+      .then(() => {
+        alert("Data deleted successfully");
+        handleReadData();
+      })
+      .catch((error) => {
+        alert("Error while deleting the data " + error.message);
+      });
   };
 
-  const handleUpdateData = async () => {
-    const result = await firestore.handleUpdateData(
-      collectionName,
-      updatingRow?.id,
-      {
+  const handleUpdateData = () => {
+    firestore
+      .handleUpdateData(collectionName, updatingRow?.id, {
         name: updatingRow?.name,
         age: updatingRow?.age,
         admin: updatingRow?.admin,
-      }
-    );
-
-    if (result.success) {
-      alert("Data updated successfully");
-      setUpdatingRow({ id: "", name: "", age: "", admin: "" });
-      handleReadData();
-    } else {
-      alert("Error while updating the data " + result.error.message);
-    }
+      })
+      .then((res) => {
+        alert("Data updated successfully" + res);
+        setUpdatingRow({ id: "", name: "", age: "", admin: "" });
+        handleReadData();
+      })
+      .catch((error) => {
+        alert("Error while updating the data " + error.message);
+      });
   };
 
   return (

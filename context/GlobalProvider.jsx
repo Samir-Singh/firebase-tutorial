@@ -102,59 +102,32 @@ const GlobalProvider = ({ children }) => {
   };
 
   const handleAddData = async (collectionName, payload) => {
-    await addDoc(collection(fireStoreDb, collectionName), payload);
+    return await addDoc(collection(fireStoreDb, collectionName), payload);
   };
 
   const handleReadData = async (collectionName) => {
-    try {
-      const querySnapShot = await getDocs(
-        collection(fireStoreDb, collectionName)
-      );
+    const querySnapShot = await getDocs(
+      collection(fireStoreDb, collectionName)
+    );
 
-      const documents = [];
-      querySnapShot.forEach((doc) => {
-        documents.push({ id: doc.id, ...doc.data() });
-      });
-      return {
-        success: true,
-        data: documents,
-        error: null,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        data: null,
-        error: error,
-      };
-    }
+    const documents = [];
+    querySnapShot.forEach((doc) => {
+      documents.push({ id: doc.id, ...doc.data() });
+    });
+    return documents;
   };
 
   const handleDeleteData = async (collectionName, id) => {
-    try {
-      await deleteDoc(doc(fireStoreDb, collectionName, id));
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error };
-    }
+    return await deleteDoc(doc(fireStoreDb, collectionName, id));
   };
 
   const handleUpdateData = async (collectionName, id, payload) => {
-    try {
-      const docRef = doc(fireStoreDb, collectionName, id);
-      await updateDoc(docRef, payload);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error };
-    }
+    const docRef = doc(fireStoreDb, collectionName, id);
+    await updateDoc(docRef, payload);
   };
 
   const handleAddRealTimeData = async (key, data) => {
-    try {
-      await set(ref(firebaseDataBase, key), data);
-      return { success: true, data: null, error: null };
-    } catch (error) {
-      return { success: false, data: null, error: error };
-    }
+    return await set(ref(firebaseDataBase, key), data);
   };
 
   const handleReadRealTimeData = (key, setData) => {
