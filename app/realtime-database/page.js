@@ -19,11 +19,18 @@ const RealTimeDatabase = () => {
       .catch((err) => alert(err));
   };
 
-  useEffect(() => {
-    realTimeDatabase.handleReadRealTimeData("todos", setTodos);
-  }, []);
+  const handleDeleteTodo = (id) => {
+    realTimeDatabase.handleDeleteRealTimeData(`todos/${id}`);
+  };
 
-  console.log("oiuytfghjk", todos);
+  useEffect(() => {
+    const unsubscribe = realTimeDatabase.handleReadRealTimeData(
+      "todos",
+      setTodos
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div>
@@ -49,10 +56,19 @@ const RealTimeDatabase = () => {
       <ul className="mt-5 w-2xs">
         {todos?.map((item) => (
           <li
-            className="bg-amber-200 mt-3 p-3 rounded-xl text-xl"
+            className="bg-amber-200 mt-3 p-3 rounded-xl text-xl flex items-center justify-between"
             key={item.id}
           >
-            {item?.text}
+            <span>{item?.text}</span>
+            <span className="inline-flex gap-3">
+              <button className="cursor-pointer">✏️</button>
+              <button
+                onClick={() => handleDeleteTodo(item.id)}
+                className="cursor-pointer"
+              >
+                ❌
+              </button>
+            </span>
           </li>
         ))}
       </ul>

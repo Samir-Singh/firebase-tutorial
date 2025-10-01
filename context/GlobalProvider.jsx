@@ -11,7 +11,15 @@ import {
   signInWithPopup,
   signOut,
 } from "firebase/auth";
-import { child, get, getDatabase, onValue, ref, set } from "firebase/database";
+import {
+  child,
+  get,
+  getDatabase,
+  onValue,
+  ref,
+  remove,
+  set,
+} from "firebase/database";
 import {
   addDoc,
   collection,
@@ -127,13 +135,18 @@ const GlobalProvider = ({ children }) => {
   };
 
   const handleAddRealTimeData = async (key, data) => {
-    return await set(ref(firebaseDataBase, key), data);
+    await set(ref(firebaseDataBase, key), data);
   };
 
   const handleReadRealTimeData = (key, setData) => {
-    onValue(ref(firebaseDataBase, key), (snapshot) => {
-      setData(Object.values(snapshot.val()));
+    const unsubscribe = onValue(ref(firebaseDataBase, key), (snapshot) => {
+      setData(snapshot.val() ? Object.values(snapshot.val()) : []);
     });
+    return unsubscribe;
+  };
+
+  const handleDeleteRealTimeData = async (key) => {
+    return await remove(ref(firebaseDataBase, key));
   };
 
   return (
@@ -157,6 +170,7 @@ const GlobalProvider = ({ children }) => {
         realTimeDatabase: {
           handleAddRealTimeData,
           handleReadRealTimeData,
+          handleDeleteRealTimeData,
         },
       }}
     >
