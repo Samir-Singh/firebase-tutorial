@@ -102,15 +102,7 @@ const GlobalProvider = ({ children }) => {
   };
 
   const handleAddData = async (collectionName, payload) => {
-    try {
-      const docRef = await addDoc(
-        collection(fireStoreDb, collectionName),
-        payload
-      );
-      return { success: true, data: docRef, error: null };
-    } catch (error) {
-      return { success: false, data: null, error: error };
-    }
+    await addDoc(collection(fireStoreDb, collectionName), payload);
   };
 
   const handleReadData = async (collectionName) => {

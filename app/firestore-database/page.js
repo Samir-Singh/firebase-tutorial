@@ -21,19 +21,28 @@ const FireStoreDatabase = () => {
   });
   const { firestore } = useGlobalContext();
 
-  const handleAddData = async () => {
-    const result = await firestore.handleAddData(formData.collection, {
-      name: formData.name,
-      age: Number(formData.age),
-      admin: formData.admin,
-    });
+  const handleAddData = () => {
+    firestore
+      .handleAddData(formData.collection, {
+        name: formData.name,
+        age: Number(formData.age),
+        admin: formData.admin,
+      })
+      .then((result) => {
+        console.log("iuytfghjk", result);
+        setFormData({ collection: "", name: "", age: "", admin: false });
+        alert("Document added with ID: " + result.data.id);
+      })
+      .catch((error) => {
+        alert("Error adding document: " + error.message);
+      });
 
-    if (result.success) {
-      setFormData({ collection: "", name: "", age: "", admin: false });
-      alert("Document added with ID: " + result.data.id);
-    } else {
-      alert("Error adding document: " + result.error.message);
-    }
+    // if (result.success) {
+    //   setFormData({ collection: "", name: "", age: "", admin: false });
+    //   alert("Document added with ID: " + result.data.id);
+    // } else {
+    //   alert("Error adding document: " + result.error.message);
+    // }
   };
 
   const handleReadData = async () => {
