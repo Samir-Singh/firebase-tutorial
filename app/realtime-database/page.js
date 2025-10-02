@@ -43,6 +43,7 @@ const RealTimeDatabase = () => {
       })
       .then(() => {
         setValue("");
+        setIsEdit(null);
       });
   };
 
