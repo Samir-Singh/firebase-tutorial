@@ -49,15 +49,6 @@ const RealTimeDatabase = () => {
   useEffect(() => {
     const unsubscribe = realTimeDatabase.handleReadRealTimeData(
       "todos",
-      setTodos
-    );
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = realTimeDatabase.handleReadRealTimeData(
-      "todos",
       (newTodos) => {
         // Compare with previous state
         const prevTodos = prevTodosRef.current;

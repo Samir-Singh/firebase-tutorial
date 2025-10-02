@@ -139,10 +139,15 @@ const GlobalProvider = ({ children }) => {
     await set(ref(firebaseDataBase, key), payload);
   };
 
-  const handleReadRealTimeData = (key, setData) => {
-    const unsubscribe = onValue(ref(firebaseDataBase, key), (snapshot) => {
-      setData(snapshot.val() ? Object.values(snapshot.val()) : []);
+  const handleReadRealTimeData = (key, cb) => {
+    const dbRef = ref(firebaseDataBase, key);
+
+    const unsubscribe = onValue(dbRef, (snapshot) => {
+      const data = snapshot.val();
+      const todos = data ? Object.values(data) : [];
+      cb(todos);
     });
+
     return unsubscribe;
   };
 
