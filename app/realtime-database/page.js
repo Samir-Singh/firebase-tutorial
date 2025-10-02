@@ -4,6 +4,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import { useEffect, useState } from "react";
 
 const RealTimeDatabase = () => {
+  const [isEdit, setIsEdit] = useState(false);
   const [value, setValue] = useState("");
   const [todos, setTodos] = useState([]);
   const { realTimeDatabase } = useGlobalContext();
@@ -21,6 +22,22 @@ const RealTimeDatabase = () => {
 
   const handleDeleteTodo = (id) => {
     realTimeDatabase.handleDeleteRealTimeData(`todos/${id}`);
+  };
+
+  const handleToggleTodo = (id) => {
+    const filteredTodo = todos?.find((item) => item?.id === id);
+    realTimeDatabase.handleUpdateRealTimeData(`todos/${id}`, {
+      ...filteredTodo,
+      completed: !filteredTodo?.completed,
+    });
+  };
+
+  const handleUpdateTodo = (id) => {
+    const filteredTodo = todos?.find((item) => item?.id === id);
+    realTimeDatabase.handleUpdateRealTimeData(`todos/${id}`, {
+      ...filteredTodo,
+      text: value,
+    });
   };
 
   useEffect(() => {
@@ -50,7 +67,7 @@ const RealTimeDatabase = () => {
         onClick={handleAddTodo}
         className="border bg-gray-300 px-2 rounded-sm cursor-pointer ml-2"
       >
-        Submit
+        {isEdit ? "Update" : "Submit"}
       </button>
 
       <ul className="mt-5 w-2xs">
@@ -59,9 +76,27 @@ const RealTimeDatabase = () => {
             className="bg-amber-200 mt-3 p-3 rounded-xl text-xl flex items-center justify-between"
             key={item.id}
           >
-            <span>{item?.text}</span>
+            <span className="inline-flex gap-3 items-center">
+              <input
+                checked={item?.completed === true}
+                onChange={() => handleToggleTodo(item?.id)}
+                type="checkbox"
+                className="w-4 h-4"
+              />
+              <span className={`${item?.completed ? "line-through" : ""}`}>
+                {item?.text}
+              </span>
+            </span>
             <span className="inline-flex gap-3">
-              <button className="cursor-pointer">✏️</button>
+              <button
+                onClick={() => {
+                  setIsEdit(true);
+                  setValue(item?.text);
+                }}
+                className="cursor-pointer"
+              >
+                ✏️
+              </button>
               <button
                 onClick={() => handleDeleteTodo(item.id)}
                 className="cursor-pointer"

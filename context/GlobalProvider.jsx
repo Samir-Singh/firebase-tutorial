@@ -19,6 +19,7 @@ import {
   ref,
   remove,
   set,
+  update,
 } from "firebase/database";
 import {
   addDoc,
@@ -44,13 +45,13 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
-const firebaseDataBase = getDatabase(firebaseApp);
+const firebaseDataBase = getDatabase(firebaseApp); // For realtime database
 
 const GlobalContext = createContext(null);
 export const useGlobalContext = () => useContext(GlobalContext);
 const GoogleProvider = new GoogleAuthProvider();
 const GithubProvider = new GithubAuthProvider();
-const fireStoreDb = getFirestore(firebaseApp);
+const fireStoreDb = getFirestore(firebaseApp); // For cloud firestore
 
 const GlobalProvider = ({ children }) => {
   const router = useRouter();
@@ -134,8 +135,8 @@ const GlobalProvider = ({ children }) => {
     await updateDoc(docRef, payload);
   };
 
-  const handleAddRealTimeData = async (key, data) => {
-    await set(ref(firebaseDataBase, key), data);
+  const handleAddRealTimeData = async (key, payload) => {
+    await set(ref(firebaseDataBase, key), payload);
   };
 
   const handleReadRealTimeData = (key, setData) => {
@@ -147,6 +148,10 @@ const GlobalProvider = ({ children }) => {
 
   const handleDeleteRealTimeData = async (key) => {
     return await remove(ref(firebaseDataBase, key));
+  };
+
+  const handleUpdateRealTimeData = async (key, payload) => {
+    await update(ref(firebaseDataBase, key), payload);
   };
 
   return (
@@ -171,6 +176,7 @@ const GlobalProvider = ({ children }) => {
           handleAddRealTimeData,
           handleReadRealTimeData,
           handleDeleteRealTimeData,
+          handleUpdateRealTimeData,
         },
       }}
     >
