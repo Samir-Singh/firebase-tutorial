@@ -1,13 +1,15 @@
 "use client";
 
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 const RealTimeDatabase = () => {
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState(null);
   const [value, setValue] = useState("");
   const [todos, setTodos] = useState([]);
   const { realTimeDatabase } = useGlobalContext();
+  const prevTodosRef = useRef([]);
 
   const handleAddTodo = () => {
     realTimeDatabase
@@ -34,16 +36,71 @@ const RealTimeDatabase = () => {
 
   const handleUpdateTodo = (id) => {
     const filteredTodo = todos?.find((item) => item?.id === id);
-    realTimeDatabase.handleUpdateRealTimeData(`todos/${id}`, {
-      ...filteredTodo,
-      text: value,
-    });
+    realTimeDatabase
+      .handleUpdateRealTimeData(`todos/${id}`, {
+        ...filteredTodo,
+        text: value,
+      })
+      .then(() => {
+        setValue("");
+      });
   };
 
   useEffect(() => {
     const unsubscribe = realTimeDatabase.handleReadRealTimeData(
       "todos",
       setTodos
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = realTimeDatabase.handleReadRealTimeData(
+      "todos",
+      (newTodos) => {
+        // Compare with previous state
+        const prevTodos = prevTodosRef.current;
+
+        if (prevTodos.length > 0) {
+          // Detect Add
+          if (newTodos.length > prevTodos.length) {
+            const added = newTodos.find(
+              (item) => !prevTodos.some((p) => p.id === item.id)
+            );
+            if (added) toast.success(`Added: ${added.text}`);
+          }
+
+          // Detect Delete
+          if (newTodos.length < prevTodos.length) {
+            const removed = prevTodos.find(
+              (item) => !newTodos.some((n) => n.id === item.id)
+            );
+            if (removed) toast.error(`Deleted: ${removed.text}`);
+          }
+
+          // Detect Update/Toggle
+          newTodos.forEach((item) => {
+            const prev = prevTodos.find((p) => p.id === item.id);
+            if (prev) {
+              if (prev.text !== item.text) {
+                toast.success(`Updated: ${item.text}`);
+              }
+              if (prev.completed !== item.completed) {
+                toast.success(
+                  `${item.text} marked as ${
+                    item.completed ? "Completed ✅" : "Incomplete ❌"
+                  }`
+                );
+              }
+            }
+          });
+        }
+
+        // Update states
+        setTodos(newTodos);
+        prevTodosRef.current = newTodos;
+      }
     );
 
     return () => unsubscribe();
@@ -64,7 +121,7 @@ const RealTimeDatabase = () => {
       />
 
       <button
-        onClick={handleAddTodo}
+        onClick={() => (isEdit ? handleUpdateTodo(isEdit) : handleAddTodo())}
         className="border bg-gray-300 px-2 rounded-sm cursor-pointer ml-2"
       >
         {isEdit ? "Update" : "Submit"}
@@ -90,7 +147,7 @@ const RealTimeDatabase = () => {
             <span className="inline-flex gap-3">
               <button
                 onClick={() => {
-                  setIsEdit(true);
+                  setIsEdit(item.id);
                   setValue(item?.text);
                 }}
                 className="cursor-pointer"
