@@ -17,7 +17,7 @@ const Header = () => {
           <span
             onClick={() => {
               authentication.LogoutUser();
-              router.push("/login");
+              router.push("/");
             }}
             className="cursor-pointer"
           >
@@ -27,7 +27,6 @@ const Header = () => {
       ) : (
         <>
           <Link href="/">Home</Link>
-          <Link href="/login">Login</Link>
           <Link href="/firestore-database">FireStore</Link>
           <Link href="/realtime-database">RealTime Database</Link>
         </>

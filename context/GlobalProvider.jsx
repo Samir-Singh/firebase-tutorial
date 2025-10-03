@@ -30,7 +30,7 @@ import {
   getFirestore,
   updateDoc,
 } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 const firebaseConfig = {
@@ -54,6 +54,7 @@ const GithubProvider = new GithubAuthProvider();
 const fireStoreDb = getFirestore(firebaseApp); // For cloud firestore
 
 const GlobalProvider = ({ children }) => {
+  const pathName = usePathname();
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const signupUserWithEmailAndPassword = (email, password) =>
@@ -95,6 +96,7 @@ const GlobalProvider = ({ children }) => {
 
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
+      console.log("oiuytfdcvbnm", user);
       if (user) {
         console.log("User Logged In");
         setIsLoggedIn(true);
@@ -102,6 +104,9 @@ const GlobalProvider = ({ children }) => {
       } else {
         console.log("User Logged Out");
         setIsLoggedIn(false);
+        if (pathName === "/about-us" || pathName === "/contact-us") {
+          router.push("/");
+        }
       }
     });
   }, []);
