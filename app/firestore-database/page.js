@@ -70,8 +70,8 @@ const FireStoreDatabase = () => {
         age: updatingRow?.age,
         admin: updatingRow?.admin,
       })
-      .then((res) => {
-        alert("Data updated successfully" + res);
+      .then(() => {
+        alert("Data updated successfully");
         setUpdatingRow({ id: "", name: "", age: "", admin: "" });
         handleReadData();
       })
@@ -101,7 +101,7 @@ const FireStoreDatabase = () => {
         onChange={(e) =>
           setFormData((prev) => ({ ...prev, name: e.target.value }))
         }
-        className="border px-2 rounded-sm mt-3"
+        className="border px-2 rounded-sm mt-3 mx-3"
         placeholder="Enter name"
         type="text"
       />

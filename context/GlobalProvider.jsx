@@ -12,8 +12,6 @@ import {
   signOut,
 } from "firebase/auth";
 import {
-  child,
-  get,
   getDatabase,
   onValue,
   ref,
@@ -78,31 +76,12 @@ const GlobalProvider = ({ children }) => {
     );
   };
 
-  const putData = (key, data) => set(ref(firebaseDataBase, key), data);
-  const getData = () => {
-    const dbRef = ref(firebaseDataBase);
-    get(child(dbRef, `users`))
-      .then((res) => {
-        if (res.exists()) {
-          console.log(res.val(), typeof res.val());
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (user) => {
-      console.log("oiuytfdcvbnm", user);
       if (user) {
-        console.log("User Logged In");
         setIsLoggedIn(true);
         router.push("/about-us");
       } else {
-        console.log("User Logged Out");
         setIsLoggedIn(false);
         if (pathName === "/about-us" || pathName === "/contact-us") {
           router.push("/");
@@ -167,8 +146,6 @@ const GlobalProvider = ({ children }) => {
   return (
     <GlobalContext.Provider
       value={{
-        putData,
-        getData,
         authentication: {
           signupUserWithEmailAndPassword,
           signInUserWithEmailAndPassword,
